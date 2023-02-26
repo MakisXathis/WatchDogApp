@@ -14,7 +14,6 @@ public class first_activity extends AppCompatActivity {
     Button send_button;
     EditText send_IP;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

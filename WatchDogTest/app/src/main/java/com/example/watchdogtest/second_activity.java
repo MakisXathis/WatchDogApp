@@ -3,7 +3,10 @@ package com.example.watchdogtest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -31,6 +34,11 @@ public class second_activity extends AppCompatActivity {
     TextView pressureValue;
     TextView movementValue;
     TextView accelerometerValue;
+    TextView systemStatusValue;
+    TextView alarmStatusValue;
+    Button doorLockSensorButton;
+    Button systemStatusButton;
+    Button deactivateAlarmButton;
 
     String retrieveHTMLAsString(String htmlpage) throws MalformedURLException {
 
@@ -156,9 +164,52 @@ public class second_activity extends AppCompatActivity {
         pressureValue = findViewById(R.id.pressureSensorValue);
         movementValue = findViewById(R.id.movementSensorValue);
         accelerometerValue = findViewById(R.id.accelerometerSensorValue);
+        systemStatusValue = findViewById(R.id.statusValue);
+        alarmStatusValue = findViewById(R.id.alarmStatusValue);
+        systemStatusButton = findViewById(R.id.systemActivationButton);
+        deactivateAlarmButton = findViewById(R.id.deactivateAlarmButton);
+        doorLockSensorButton = findViewById(R.id.doorLockSensorButton);
 
         pressureValue.setText(kitchenCensorValues.get("Air Pressure"));
+        if (kitchenCensorValues.get("Air Pressure").equals("OK"))
+            pressureValue.setTextColor(Color.parseColor("#15BD17"));
+        else
+            pressureValue.setTextColor(Color.parseColor("#FF0000"));
         movementValue.setText(kitchenCensorValues.get("Motion Sensor"));
+        if (kitchenCensorValues.get("Motion Sensor").equals("OK"))
+            movementValue.setTextColor(Color.parseColor("#15BD17"));
+        else
+            movementValue.setTextColor(Color.parseColor("#FF0000"));
         accelerometerValue.setText(kitchenCensorValues.get("Door Handle"));
+        if (kitchenCensorValues.get("Door Handle").equals("OK"))
+            accelerometerValue.setTextColor(Color.parseColor("#15BD17"));
+        else
+            accelerometerValue.setTextColor(Color.parseColor("#FF0000"));
+
+        if(deactivated_system){
+            systemStatusValue.setText("Deactivated");
+            systemStatusValue.setTextColor(Color.parseColor("#FF0000"));
+            systemStatusButton.setText("Activate System");
+
+        }else{
+            systemStatusValue.setText("Activated");
+            systemStatusValue.setTextColor(Color.parseColor("#15BD17"));
+            systemStatusButton.setText("Deactivate System");
+        }
+
+        if(statusOk){
+            alarmStatusValue.setText("OK");
+            alarmStatusValue.setTextColor(Color.parseColor("#15BD17"));
+            deactivateAlarmButton.setVisibility(View.GONE);
+        }else{
+            alarmStatusValue.setText("IN ALARM");
+            alarmStatusValue.setTextColor(Color.parseColor("#FF0000"));
+            deactivateAlarmButton.setVisibility(View.VISIBLE);
+        }
+
+        if (kitchenCensorValues.get("Lock Status").equals("Lock Door"))
+            doorLockSensorButton.setText(kitchenCensorValues.get("Lock Status"));
+        else
+            doorLockSensorButton.setText(kitchenCensorValues.get("Lock Status"));
     }
 }
