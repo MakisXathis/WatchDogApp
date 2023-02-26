@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -39,6 +40,7 @@ public class second_activity extends AppCompatActivity {
     Button doorLockSensorButton;
     Button systemStatusButton;
     Button deactivateAlarmButton;
+    ImageButton refreshButton;
 
     String retrieveHTMLAsString(String htmlpage) throws MalformedURLException {
 
@@ -106,7 +108,7 @@ public class second_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
-        Boolean deactivated_system = false;
+        Boolean activated_system = false;
         Boolean statusOk = false;
         Boolean active_alarm = false;
 
@@ -140,9 +142,9 @@ public class second_activity extends AppCompatActivity {
 
         for (Element currentHref : hrefs) {
             if (currentHref.toString().contains("/D")) {
-                deactivated_system = false;
+                activated_system = true;
             } else if (currentHref.toString().contains("/A")) {
-                deactivated_system = true;
+                activated_system = false;
             }
             if (currentHref.toString().contains("/H")) {
                 active_alarm = true;
@@ -157,9 +159,9 @@ public class second_activity extends AppCompatActivity {
             statusOk = false;
         }
 
-        System.out.println(active_alarm);
-        System.out.println(deactivated_system);
-        System.out.println(statusOk);
+        System.out.println("Active Alarm:"+active_alarm);
+        System.out.println("Deactivated System:"+activated_system);
+        System.out.println("Status Ok:"+statusOk);
 
         pressureValue = findViewById(R.id.pressureSensorValue);
         movementValue = findViewById(R.id.movementSensorValue);
@@ -169,6 +171,7 @@ public class second_activity extends AppCompatActivity {
         systemStatusButton = findViewById(R.id.systemActivationButton);
         deactivateAlarmButton = findViewById(R.id.deactivateAlarmButton);
         doorLockSensorButton = findViewById(R.id.doorLockSensorButton);
+        refreshButton = findViewById(R.id.refreshButton);
 
         pressureValue.setText(kitchenCensorValues.get("Air Pressure"));
         if (kitchenCensorValues.get("Air Pressure").equals("OK"))
@@ -186,15 +189,14 @@ public class second_activity extends AppCompatActivity {
         else
             accelerometerValue.setTextColor(Color.parseColor("#FF0000"));
 
-        if(deactivated_system){
-            systemStatusValue.setText("Deactivated");
-            systemStatusValue.setTextColor(Color.parseColor("#FF0000"));
-            systemStatusButton.setText("Activate System");
-
-        }else{
+        if(activated_system){
             systemStatusValue.setText("Activated");
             systemStatusValue.setTextColor(Color.parseColor("#15BD17"));
             systemStatusButton.setText("Deactivate System");
+        }else{
+            systemStatusValue.setText("Deactivated");
+            systemStatusValue.setTextColor(Color.parseColor("#FF0000"));
+            systemStatusButton.setText("Activate System");
         }
 
         if(statusOk){
@@ -211,5 +213,11 @@ public class second_activity extends AppCompatActivity {
             doorLockSensorButton.setText(kitchenCensorValues.get("Lock Status"));
         else
             doorLockSensorButton.setText(kitchenCensorValues.get("Lock Status"));
+
+        refreshButton.setOnClickListener(v -> {
+            finish();
+            startActivity(getIntent());
+        });
+
     }
 }
