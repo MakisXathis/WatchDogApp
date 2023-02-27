@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -69,6 +70,33 @@ public class second_activity extends AppCompatActivity {
             e.printStackTrace();
         }
         return htmlCode;
+    }
+
+    private void makeRequest(String htmlpage){
+        FutureTask<String> futureTask = new FutureTask<>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                URL url = new URL(htmlpage);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                reader.close();
+
+                // Return the HTML code as a string
+                return stringBuilder.toString();
+            }
+        });
+
+        executor.execute(futureTask);
+        String htmlCode="";
+        try {
+            htmlCode = futureTask.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     HashMap<String, String> sensorValues(Document document){
@@ -217,6 +245,56 @@ public class second_activity extends AppCompatActivity {
         refreshButton.setOnClickListener(v -> {
             finish();
             startActivity(getIntent());
+        });
+
+
+        Boolean finalActivated_system = activated_system;
+        systemStatusButton.setOnClickListener(v -> {
+            String requestURL = "";
+            if (finalActivated_system){
+                requestURL = intent.getStringExtra("Public IP")+"/D";
+            }else
+                requestURL = intent.getStringExtra("Public IP")+"/A";
+            makeRequest(requestURL);
+
+            System.out.println("Made System Request");
+
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                    refreshButton.performClick();
+                }
+            }, 1500); // 5 seconds
+        });
+
+        deactivateAlarmButton.setOnClickListener(v -> {
+
+            String requestURL = intent.getStringExtra("Public IP")+"/H";
+            makeRequest(requestURL);
+
+            System.out.println("Made Alarm Deactivate Request");
+
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                    refreshButton.performClick();
+                }
+            }, 1500); // 1.5 seconds
+        });
+
+        doorLockSensorButton.setOnClickListener(v -> {
+            String requestURL = "";
+            if(doorLockSensorButton.getText().toString() == "LOCK DOOR")
+                requestURL = intent.getStringExtra("Public IP")+"/kitchen/lock";
+            else
+                requestURL = intent.getStringExtra("Public IP")+"/kitchen/unlock";
+            makeRequest(requestURL);
+
+            System.out.println("Made Door Lock/Unlock Request");
+
+            new Handler().postDelayed(new Runnable() {
+                public void run() {
+                    refreshButton.performClick();
+                }
+            }, 1500); // 1.5 seconds
         });
 
     }
